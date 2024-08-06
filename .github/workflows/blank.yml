@@ -23,7 +23,7 @@ jobs:
         Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
 
         # إنشاء مستخدم وتعيين كلمة مرور
-        net user rdpuser StrongPassword123! /add
+        net user rdpuser 123456789 /add
         net localgroup administrators rdpuser /add
 
         # الحصول على عنوان ngrok
