@@ -22,6 +22,10 @@ jobs:
         netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
         Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
 
+        # إنشاء مستخدم وتعيين كلمة مرور
+        net user rdpuser StrongPassword123! /add
+        net localgroup administrators rdpuser /add
+
         # الحصول على عنوان ngrok
         Start-Sleep -Seconds 10
         $ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
