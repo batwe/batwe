@@ -25,7 +25,7 @@ jobs:
 
         # إنشاء مستخدم وتعيين كلمة مرور
         $username = "rdpuser"
-        $password = "StrongPassword123!"
+        $password = "psad34356"
         net user $username $password /add
         net localgroup administrators $username /add
 
