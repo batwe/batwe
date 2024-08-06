@@ -29,7 +29,7 @@ jobs:
         net user $username $password /add
         net localgroup administrators $username /add
 
-        # الحصول على عنوان ngrok
+        # الحصول على عنوان ngr
         Start-Sleep -Seconds 10
         $ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
         Write-Output "RDP URL: $ngrok_url"
@@ -37,4 +37,4 @@ jobs:
         Write-Output "Password: $password"
 
         # تشغيل الجلسة لمدة ساعتين (يمكن تعديل الوقت حسب الحاجة)
-        Start-Sleep -Seconds 7200 # 2 ساعات
+        Start-Sleep -Seconds 21600 # 2 ساعات
