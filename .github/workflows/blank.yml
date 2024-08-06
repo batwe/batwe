@@ -48,7 +48,7 @@ jobs:
       run: |
         Start-Sleep -Seconds 10
         $ngrok_urls = @()
-        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4050/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
         $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4041/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
         $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4042/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
         $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4043/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
