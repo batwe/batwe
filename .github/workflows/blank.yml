@@ -1,6 +1,7 @@
 name: RDP on Windows
 
-on: [push]
+on:
+  workflow_dispatch: # يضيف زر "Run workflow" في واجهة GitHub
 
 jobs:
   build:
@@ -23,13 +24,17 @@ jobs:
         Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
 
         # إنشاء مستخدم وتعيين كلمة مرور
-        net user rdpuser 123456789 /add
-        net localgroup administrators rdpuser /add
+        $username = "rdpuser"
+        $password = "StrongPassword123!"
+        net user $username $password /add
+        net localgroup administrators $username /add
 
         # الحصول على عنوان ngrok
         Start-Sleep -Seconds 10
         $ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
         Write-Output "RDP URL: $ngrok_url"
+        Write-Output "Username: $username"
+        Write-Output "Password: $password"
 
         # تشغيل الجلسة لمدة ساعتين (يمكن تعديل الوقت حسب الحاجة)
         Start-Sleep -Seconds 7200 # 2 ساعات
