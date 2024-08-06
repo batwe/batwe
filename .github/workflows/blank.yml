@@ -16,7 +16,7 @@ jobs:
         choco install ngrok -y
 
         # تكوين ngrok باستخدام التوكن الخاص بك
-        ngrok authtoken 2j3sQeJmgjw6ytNyBcY7cZO3wJe_32QMDM5HsgkCZ7GHVFN6a
+        ngrok authtoken 2kIrEqahRiC2NoZVIAXSRzJjzbv_3TogR9itXRoWeLroUjwpZ
         ngrok tcp 3389 &
 
         # إعداد RDP
