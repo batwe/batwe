@@ -7,56 +7,34 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Install Chocolatey
+    - name: Start RDP
       run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force
-        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        # تثبيت Chocolatey
+        Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-    - name: Install ngrok
-      run: choco install ngrok -y
+        # تثبيت ngrok
+        choco install ngrok -y
 
-    - name: Start ngrok tunnels
-      run: |
-        # Function to start ngrok with a given token and port
-        function Start-Ngrok($token, $port, $logFile) {
-          Start-Process -NoNewWindow -FilePath "ngrok" -ArgumentList "authtoken", $token
-          Start-Process -NoNewWindow -FilePath "ngrok" -ArgumentList "tcp", $port, "--log=stdout" -RedirectStandardOutput $logFile
-        }
+        # تكوين ngrok باستخدام التوكن الخاص بك
+        ngrok authtoken 2j3sQeJmgjw6ytNyBcY7cZO3wJe_32QMDM5HsgkCZ7GHVFN6a
+        ngrok tcp 3389 &
 
-        # Start each ngrok session with different tokens and ports
-        Start-Ngrok "2j3sQeJmgjw6ytNyBcY7cZO3wJe_32QMDM5HsgkCZ7GHVFN6a" 3389 "ngrok1.log"
-        Start-Ngrok "2j3v4QxQEQdtNjf2NDiaZDqbFRf_5kcp8fpoGBY5asEEWQuHZ" 3390 "ngrok2.log"
-        Start-Ngrok "2Wx9yiLIPYpHgcxjHEWoXgPYSbP_7qQRS18KQCWceQUbmKTx3" 3391 "ngrok3.log"
-        Start-Ngrok "2j4h3VCGh0J9XZXXzJ5MgXhhVEH_31QgSW678EYsJwHSQkpot" 3392 "ngrok4.log"
-        Start-Ngrok "2j4lN6BpST3r5p0MpwRPQJWLSgg_4nKvazJu7md87jHJt86yY" 3393 "ngrok5.log"
-
-    - name: Configure RDP
-      run: |
-        # Enable Remote Desktop through firewall
+        # إعداد RDP
         netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
-
-        # Enable Remote Desktop connections
         Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
 
-        # Create a new user with admin privileges
+        # إنشاء مستخدم وتعيين كلمة مرور
         $username = "rdpuser"
         $password = "psad34356@"
         net user $username $password /add
         net localgroup administrators $username /add
 
-    - name: Get ngrok URLs
-      run: |
+        # الحصول على عنوان ngrok
         Start-Sleep -Seconds 10
-        $ngrok_urls = @()
-        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4050/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4041/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4042/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4043/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4044/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-
-        Write-Output "RDP URLs: $ngrok_urls"
+        $ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        Write-Output "RDP URL: $ngrok_url"
         Write-Output "Username: $username"
         Write-Output "Password: $password"
 
-    - name: Keep RDP session alive
-      run: Start-Sleep -Seconds 7200 # 2 ساعات
+        # تشغيل الجلسة لمدة ساعتين (يمكن تعديل الوقت حسب الحاجة)
+        Start-Sleep -Seconds 7200 # 2 ساعات
