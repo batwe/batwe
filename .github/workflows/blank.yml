@@ -9,17 +9,18 @@ jobs:
     steps:
     - name: Install Chocolatey
       run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
     - name: Install ngrok
       run: choco install ngrok -y
 
-    - name: Configure ngrok and start tunnels
+    - name: Start ngrok tunnels
       run: |
         # Function to start ngrok with a given token and port
-        function Start-Ngrok($token, $port, $logFile, $configFile) {
-          ngrok authtoken $token
-          ngrok tcp $port --log=stdout > $logFile &
+        function Start-Ngrok($token, $port, $logFile) {
+          Start-Process -NoNewWindow -FilePath "ngrok" -ArgumentList "authtoken", $token
+          Start-Process -NoNewWindow -FilePath "ngrok" -ArgumentList "tcp", $port, "--log=stdout" -RedirectStandardOutput $logFile
         }
 
         # Start each ngrok session with different tokens and ports
@@ -31,27 +32,29 @@ jobs:
 
     - name: Configure RDP
       run: |
+        # Enable Remote Desktop through firewall
         netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
+
+        # Enable Remote Desktop connections
         Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
+
+        # Create a new user with admin privileges
         $username = "rdpuser"
-        $password = "StrongPassword123!"
+        $password = "psad34356@"
         net user $username $password /add
         net localgroup administrators $username /add
 
     - name: Get ngrok URLs
       run: |
         Start-Sleep -Seconds 10
-        $ngrok_url1 = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-        $ngrok_url2 = (Invoke-WebRequest -Uri http://127.0.0.1:4041/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-        $ngrok_url3 = (Invoke-WebRequest -Uri http://127.0.0.1:4042/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-        $ngrok_url4 = (Invoke-WebRequest -Uri http://127.0.0.1:4043/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
-        $ngrok_url5 = (Invoke-WebRequest -Uri http://127.0.0.1:4044/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        $ngrok_urls = @()
+        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4041/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4042/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4043/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        $ngrok_urls += (Invoke-WebRequest -Uri http://127.0.0.1:4044/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
 
-        Write-Output "RDP URL 1: $ngrok_url1"
-        Write-Output "RDP URL 2: $ngrok_url2"
-        Write-Output "RDP URL 3: $ngrok_url3"
-        Write-Output "RDP URL 4: $ngrok_url4"
-        Write-Output "RDP URL 5: $ngrok_url5"
+        Write-Output "RDP URLs: $ngrok_urls"
         Write-Output "Username: $username"
         Write-Output "Password: $password"
 
