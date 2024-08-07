@@ -37,4 +37,4 @@ jobs:
         Write-Output "Password: $password"
 
         # تشغيل الجلسة لمدة ساعتين (يمكن تعديل الوقت حسب الحاجة)
-        Start-Sleep -Seconds 7200 # 2 ساعات
+        Start-Sleep -Seconds 21000 # 2 ساعات
