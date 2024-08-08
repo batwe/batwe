@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Start RDP
+    - name: Start RDP (Part 1)
       run: |
         # تثبيت Chocolatey
         Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
@@ -15,8 +15,23 @@ jobs:
         # تثبيت ngrok
         choco install ngrok -y
 
-        # تكوين ngrok باستخدام التوكن الخاص بك
-        ngrok authtoken 2kIrEqahRiC2NoZVIAXSRzJjzbv_3TogR9itXRoWeLroUjwpZ
+        # قائمة التوكنات
+        $tokens = @(
+          "2j3sQeJmgjw6ytNyBcY7cZO3wJe_32QMDM5HsgkCZ7GHVFN6a",
+          "2j3v4QxQEQdtNjf2NDiaZDqbFRf_5kcp8fpoGBY5asEEWQuHZ",
+          "2Wx9yiLIPYpHgcxjHEWoXgPYSbP_7qQRS18KQCWceQUbmKTx3",
+          "2j4h3VCGh0J9XZXXzJ5MgXhhVEH_31QgSW678EYsJwHSQkpot",
+          "2j4lN6BpST3r5p0MpwRPQJWLSgg_4nKvazJu7md87jHJt86yY",
+          "2kIrEqahRiC2NoZVIAXSRzJjzbv_3TogR9itXRoWeLroUjwpZ",
+          "2kItWkJGFUjqzcpAjq0563RJcg3_2whKVGUZ7w5z19Y4eknii",
+          "2kIufzju9gvL9IpvSJgFrmeE409_5mvjPgTeiW9wSCU8KwK3D"
+        )
+        
+        # اختيار توكن ngrok عشوائي من القائمة
+        $randomToken = Get-Random -InputObject $tokens
+
+        # تكوين ngrok باستخدام التوكن العشوائي
+        ngrok authtoken $randomToken
         ngrok tcp 3389 &
 
         # إعداد RDP
@@ -36,5 +51,38 @@ jobs:
         Write-Output "Username: $username"
         Write-Output "Password: $password"
 
-        # تشغيل الجلسة لمدة ساعتين (يمكن تعديل الوقت حسب الحاجة)
-        Start-Sleep -Seconds 21000 # 2 ساعات
+        # تشغيل الجلسة لمدة 6 ساعات (21600 ثانية)
+        Start-Sleep -Seconds 21600 # 6 ساعات
+
+    - name: Continue RDP (Part 2)
+      run: |
+        # الحصول على عنوان ngrok
+        $ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        Write-Output "RDP URL: $ngrok_url"
+        Write-Output "Username: rdpuser"
+        Write-Output "Password: StrongPassword123!"
+
+        # تشغيل الجلسة لمدة 6 ساعات إضافية (21600 ثانية)
+        Start-Sleep -Seconds 21600 # 6 ساعات
+
+    - name: Continue RDP (Part 3)
+      run: |
+        # الحصول على عنوان ngrok
+        $ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        Write-Output "RDP URL: $ngrok_url"
+        Write-Output "Username: rdpuser"
+        Write-Output "Password: psad34356@"
+
+        # تشغيل الجلسة لمدة 6 ساعات إضافية (21600 ثانية)
+        Start-Sleep -Seconds 21600 # 6 ساعات
+
+    - name: Continue RDP (Part 4)
+      run: |
+        # الحصول على عنوان ngrok
+        $ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing | ConvertFrom-Json).tunnels[0].public_url
+        Write-Output "RDP URL: $ngrok_url"
+        Write-Output "Username: rdpuser"
+        Write-Output "Password: psad34356@"
+
+        # تشغيل الجلسة لمدة 6 ساعات إضافية (21600 ثانية)
+        Start-Sleep -Seconds 21600 # 6 ساعات
